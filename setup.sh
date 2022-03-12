@@ -24,31 +24,42 @@ echo; wait
 printf "${S1}Authored by:- Suman Kumar ~BHUTUU${R0}\n"; wait
 echo
 sleep 3
+#<<----Downloader function---->>#
+WGET() {
+  while true; do
+    wget $1
+    if [ "$?" == '0' ]; then
+      break
+    else
+      printf "\n${S2}Network error trying again........${R0}\n\n"
+    fi
+  done
+}
 #<<----aarch64---->>
 __aarch64__() {
  cd $HOME
- wget https://github.com/cloudflare/cloudflared/releases/download/2021.10.3/cloudflared-linux-arm64
+ WGET "https://github.com/cloudflare/cloudflared/releases/download/2021.10.3/cloudflared-linux-arm64"
  mv cloudflared-linux-arm64 cloudflared
  chmod +x cloudflared
  }
 #<<----aarch32----->>
 __aarch32__() {
  cd $HOME
- wget https://github.com/cloudflare/cloudflared/releases/download/2021.10.3/cloudflared-linux-arm
+ WGET "https://github.com/cloudflare/cloudflared/releases/download/2021.10.3/cloudflared-linux-arm"
  mv cloudflared-linux-arm cloudflared
  chmod +x cloudflared
 }
 #<<----32bit---->>
 __32bit__() {
  cd $HOME
- wget https://github.com/cloudflare/cloudflared/releases/download/2021.10.3/cloudflared-linux-386
+ WGET "https://github.com/cloudflare/cloudflared/releases/download/2021.10.3/cloudflared-linux-386"
  mv cloudflared-linux-386 cloudflared
  chmod +x cloudflared
 }
 #<<----amd64---->>
 __amd64__() {
  cd $HOME
- wget https://github.com/cloudflare/cloudflared/releases/download/2021.10.3/cloudflared-linux-amd64
+ WGET "https://github.com/cloudflare/cloudflared/releases/download/2021.10.3/cloudflared-linux-amd64"
  mv cloudflared-linux-amd64 cloudflared
  chmod +x cloudflared
 }
