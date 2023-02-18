@@ -31,7 +31,7 @@ WGET() {
     if [ "$?" == '0' ]; then
       break
     else
-      printf "\n${S2}Try using sudo if using linux | Run in administrative mode in windows | Or check your networkss${R0}\n\n"
+      printf "\n${S2}check your Internet connection${R0}\n\n"
     fi
   done
 }
@@ -226,6 +226,19 @@ elif [[ ${OS^^} == *'LINUX'* ]]; then
     echo
     printf "${S4}${B1}CLOUDFLARE${R1} IS INSTALLED IN YOUR SYSTEM ~SUCESSFULLY!! :)${R0}\n"
 elif [[ ${OS^^} == *'MSYS'* || ${OS^^} == *'WINDOWS'* ]]; then
+  PREFIX="/usr"
+  adminPerm=$(net user administrator | grep active | awk '{print $NF}')
+  case ${adminPerm,,} in
+    yes) opposite="no";;
+    no) opposite="yes";;
+    *) printf "Not possible to run this\n"; exit 1;;
+  esac
+  net user administrator /active:${opposite} >/dev/null 2>&1
+  adminPerm=$(net user administrator | grep active | awk '{print $NF}')
+  if [[ ${adminPerm,,} != "${opposite}" ]]; then
+    printf "${S2}[${S1}!${S2}]${S4}Run this command prompt or shell in Administrator mode${R0}\n"
+    exit 1
+  fi
   echo; wait
   echo; wait
   echo -e "${S2}YOU ARE USING: ${R0}\n"; wait
