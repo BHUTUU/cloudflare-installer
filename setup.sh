@@ -14,10 +14,10 @@ echo
 wait() {
 sleep 0.02
 }
-printf "${S7}╔═══╦╗────────╔╗╔═╦╗${R0}\n"; wait
-printf "${S6}║╔═╗║║────────║║║╔╣║${R0}\n"; wait
-printf "${S2}║║─╚╣║╔══╦╗╔╦═╝╠╝╚╣║╔══╦═╦══╗${R0}\n"; wait
-printf "${S2}║║─╔╣║║╔╗║║║║╔╗╠╗╔╣║║╔╗║╔╣║═╣${R0}\n"; wait
+printf "${S7}╔═══╦╗        ╔╗╔═╦╗${R0}\n"; wait
+printf "${S6}║╔═╗║║        ║║║╔╣║${R0}\n"; wait
+printf "${S2}║║ ╚╣║╔══╦╗╔╦═╝╠╝╚╣║╔══╦═╦══╗${R0}\n"; wait
+printf "${S2}║║ ╔╣║║╔╗║║║║╔╗╠╗╔╣║║╔╗║╔╣║═╣${R0}\n"; wait
 printf "${S3}║╚═╝║╚╣╚╝║╚╝║╚╝║║║║╚╣╔╗║║║║═╣${Rp}\n"; wait
 printf "${S1}╚═══╩═╩══╩══╩══╝╚╝╚═╩╝╚╩╝╚══╝${R0}${B5}${S2} INSTALLER ${R0}${R1}\n"; wait
 echo; wait
@@ -31,10 +31,21 @@ WGET() {
     if [ "$?" == '0' ]; then
       break
     else
-      printf "\n${S2}Network error trying again........${R0}\n\n"
+      printf "\n${S2}Try using sudo if using linux | Run in administrative mode in windows | Or check your networkss${R0}\n\n"
     fi
   done
 }
+#<<<<<--------WINDOWS------>>>>>
+_win64_() {
+  cd /usr/bin
+  WGET 	"https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-windows-amd64.exe"
+  mv cloudflared-windows-amd64.exe cloudflared
+}
+_win32_() {
+  WGET "https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-windows-386.exe"
+  mv cloudflared-windows-386.exe cloudflared
+}
+#<<<<<--------LINUX-------->>>>>
 #<<----aarch64---->>
 __aarch64__() {
  cd $HOME
@@ -88,9 +99,9 @@ if [[ ${OS^^} == *'ANDROID'* ]]; then
     printf "${S2}YOU ARE USING ${S7}     ╔════╗${R0}\n"; wait
     printf "                   ${S3}║╔╗╔╗║${R0}\n"; wait
     printf "                   ${S3}╚╝║║╠╩═╦═╦╗╔╦╗╔╦╗╔╗${R0}\n"; wait
-    printf "                   ${S2}──║║║║═╣╔╣╚╝║║║╠╬╬╝${R0}\n"; wait
-    printf "                   ${S6}──║║║║═╣║║║║║╚╝╠╬╬╗${R0}\n"; wait
-    printf "                   ${S1}──╚╝╚══╩╝╚╩╩╩══╩╝╚╝ !! :)${R0}\n"; wait
+    printf "                   ${S2}  ║║║║═╣╔╣╚╝║║║╠╬╬╝${R0}\n"; wait
+    printf "                   ${S6}  ║║║║═╣║║║║║╚╝╠╬╬╗${R0}\n"; wait
+    printf "                   ${S1}  ╚╝╚══╩╝╚╩╩╩══╩╝╚╝ !! :)${R0}\n"; wait
     echo; wait
     printf "${S3}DOWNLOADING CLOUDFLARE....${R0}\n"; wait
     echo
@@ -214,6 +225,34 @@ elif [[ ${OS^^} == *'LINUX'* ]]; then
     mv -v ${HOME}/cloudflared /usr/bin > /dev/null 2>&1
     echo
     printf "${S4}${B1}CLOUDFLARE${R1} IS INSTALLED IN YOUR SYSTEM ~SUCESSFULLY!! :)${R0}\n"
+elif [[ ${OS^^} == *'MSYS'* || ${OS^^} == *'WINDOWS'* ]]; then
+  echo; wait
+  echo; wait
+  echo -e "${S2}YOU ARE USING: ${R0}\n"; wait
+  printf "${S7}██████          ██████ ██████████ ██████          ██████ ████████████   ██████████████ ██████          ██████ ██████████████ ${R0}\n"; wait
+  printf "${S7}██░░██          ██░░██ ██░░░░░░██ ██░░██████████  ██░░██ ██░░░░░░░░████ ██░░░░░░░░░░██ ██░░██          ██░░██ ██░░░░░░░░░░██ ${R0}\n"; wait
+  printf "${S3}██░░██          ██░░██ ████░░████ ██░░░░░░░░░░██  ██░░██ ██░░████░░░░██ ██░░██████░░██ ██░░██          ██░░██ ██░░██████████ ${R0}\n"; wait
+  printf "${S3}██░░██          ██░░██   ██░░██   ██░░██████░░██  ██░░██ ██░░██  ██░░██ ██░░██  ██░░██ ██░░██          ██░░██ ██░░██         ${R0}\n"; wait
+  printf "${S3}██░░██  ██████  ██░░██   ██░░██   ██░░██  ██░░██  ██░░██ ██░░██  ██░░██ ██░░██  ██░░██ ██░░██  ██████  ██░░██ ██░░██████████ ${R0}\n"; wait
+  printf "${S2}██░░██  ██░░██  ██░░██   ██░░██   ██░░██  ██░░██  ██░░██ ██░░██  ██░░██ ██░░██  ██░░██ ██░░██  ██░░██  ██░░██ ██░░░░░░░░░░██ ${R0}\n"; wait
+  printf "${S2}██░░██  ██░░██  ██░░██   ██░░██   ██░░██  ██░░██  ██░░██ ██░░██  ██░░██ ██░░██  ██░░██ ██░░██  ██░░██  ██░░██ ██████████░░██ ${R0}\n"; wait
+  printf "${S2}██░░██████░░██████░░██   ██░░██   ██░░██  ██░░██████░░██ ██░░██  ██░░██ ██░░██  ██░░██ ██░░██████░░██████░░██         ██░░██ ${R0}\n"; wait
+  printf "${S6}██░░░░░░░░░░░░░░░░░░██ ████░░████ ██░░██  ██░░░░░░░░░░██ ██░░████░░░░██ ██░░██████░░██ ██░░░░░░░░░░░░░░░░░░██ ██████████░░██ ${R0}\n"; wait
+  printf "${S6}██░░██████░░██████░░██ ██░░░░░░██ ██░░██  ██████████░░██ ██░░░░░░░░████ ██░░░░░░░░░░██ ██░░██████░░██████░░██ ██░░░░░░░░░░██ ${R0}\n"; wait
+  printf "${S1}██████  ██████  ██████ ██████████ ██████          ██████ ████████████   ██████████████ ██████  ██████  ██████ ██████████████${R0}\n\n";wait
+
+  printf "${S3}DOWNLOADING CLOUDFLARE....${R0}\n"
+  if [[ ${archit^^} == *'X86_64'* || ${archit^^} == *'AMD64'* ]]; then
+    _win64_
+    mv -v cloudflared /usr/bin
+    printf "\n${S4}${B1}cloudflare${R1} IS INSTALLED IN YOUR SYSTEM ~SUCESSFULLY!! :)${R0}\n"
+  elif [[ ${archit^^} == *'386'* || ${archit^^} == 'X86' || ${archit^^} == *'686'* || ${archit^^} == *'X86_32'* || ${archit^^} == 'AMD' ]]; then
+    _win32_
+    mv -v cloudflared /usr/bin
+    printf "\n${S4}${B1}cloudflare${R1} IS INSTALLED IN YOUR SYSTEM ~SUCESSFULLY!! :)${R0}\n"
+  else
+    printf "${S2}[${S1}!${S2}]${S1} SORRY!! BUT THIS INSTALLER IS NOT FOR YOUR SYSTEM SO INSTALL CLOUDFLARE MANNUALY!!!${R0}\n"
+  fi
 else
   printf "${S2}[${S1}!${S2}]${S1} SORRY!! BUT THIS INSTALLER IS NOT FOR YOUR SYSTEM SO INSTALL CLOUDFLARE MANNUALY!!!${R0}\n"
 fi
