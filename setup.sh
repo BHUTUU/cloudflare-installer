@@ -39,7 +39,7 @@ WGET() {
 _win64_() {
   cd /usr/bin
   WGET 	"https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-windows-amd64.exe"
-  mv cloudflared-windows-amd64.exe cloudflared
+  mv cloudflared-windows-amd64.exe cloudflared.exe
 }
 _win32_() {
   WGET "https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-windows-386.exe"
@@ -257,11 +257,11 @@ elif [[ ${OS^^} == *'MSYS'* || ${OS^^} == *'WINDOWS'* ]]; then
   printf "${S3}DOWNLOADING CLOUDFLARE....${R0}\n"
   if [[ ${archit^^} == *'X86_64'* || ${archit^^} == *'AMD64'* ]]; then
     _win64_
-    mv -v cloudflared /usr/bin
+    mv -v cloudflared.exe /usr/bin
     printf "\n${S4}${B1}cloudflare${R1} IS INSTALLED IN YOUR SYSTEM ~SUCESSFULLY!! :)${R0}\n"
   elif [[ ${archit^^} == *'386'* || ${archit^^} == 'X86' || ${archit^^} == *'686'* || ${archit^^} == *'X86_32'* || ${archit^^} == 'AMD' ]]; then
     _win32_
-    mv -v cloudflared /usr/bin
+    mv -v cloudflared.exe /usr/bin
     printf "\n${S4}${B1}cloudflare${R1} IS INSTALLED IN YOUR SYSTEM ~SUCESSFULLY!! :)${R0}\n"
   else
     printf "${S2}[${S1}!${S2}]${S1} SORRY!! BUT THIS INSTALLER IS NOT FOR YOUR SYSTEM SO INSTALL CLOUDFLARE MANNUALY!!!${R0}\n"
