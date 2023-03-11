@@ -66,8 +66,9 @@ def internetCheckDialogBox():
     internetBox.mainloop()
     return val
 
-
 def mainDialogBox():
+    def onCloseALL():
+        winRoot.destroy()
     winRoot = Tk()
     #<<<---Box dimentioning----->>>
     winRoot.geometry("700x500")
@@ -280,11 +281,19 @@ def mainDialogBox():
     #argeement check box frame
     argreeCheckBoxFrame = Frame(winRoot, bg="green")
     argreeCheckBoxFrame.pack(fill="x")
+    agreeValue = IntVar()
+    def checkEffect():
+        if agreeValue.get() == 1:
+            installButton['state'] = ACTIVE
+        else:
+            installButton['state'] = DISABLED
+   
+    agreeMessage = "I have read all the terms and conditions and Ready to install this software."
+    termsAndConditionButton = Checkbutton(argreeCheckBoxFrame, text=agreeMessage,variable=agreeValue ,onvalue=1, offvalue=0, command=checkEffect)
+    termsAndConditionButton.pack()
  
  
- 
- 
- 
+
  
     #Install progress bar frame
     installProgressFrame = Frame(winRoot, bg="#FFFFE4")
@@ -297,15 +306,14 @@ def mainDialogBox():
     #install and cancel frame
     buttonFrame = Frame(winRoot, bg="#FFFFE4")
     buttonFrame.pack(fill="x", padx=10, pady=[5,0])
-
-
-
-
+    installButton = Button(buttonFrame, text="Install", state=DISABLED)
+    installButton.pack(side=LEFT, padx=[20,0])
+    cancelButton = Button(buttonFrame, text="Cancel",state=ACTIVE, command=onCloseALL)
+    cancelButton.pack(side=RIGHT, padx=[0,20])
 
     winRoot.mainloop()
 #main section----->>>
 if realName == 'windows':
-    #mainDialogBox()
     if internetCheckDialogBox():
         mainDialogBox()
     else:
@@ -313,10 +321,10 @@ if realName == 'windows':
 
 #planning section---->>>
 '''
-internet check and if off result no internet on a dialog
+internet check and if off result no internet on a dialog --done
 check box
 button install, cancel
-progress bar
+progress bar --postponed
 github download and configure
 cloudflared download and configure
 
