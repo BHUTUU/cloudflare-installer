@@ -9,6 +9,7 @@ Date: Bahut time lag gya hai bro ab date yaaad nhi hai. Aaj dhyan aaya hai ki do
 import os, requests, webbrowser, platform
 from time import sleep as sleep
 from tkinter import *
+from tkinter import ttk
 from PIL import Image, ImageTk
 #<<<------Internal Variables----->>>
 OS = str(os.name)
@@ -28,6 +29,7 @@ elif OS.upper() == 'POSIX' or OS.upper() == 'GNU/LINUX' or OS.upper() == 'LINUX'
 def internetCheck():
     try:
         requests.get("https://google.com/")
+        # requests.get("http://127.0.0.1:8080/")
         return True
     except:
         return False
@@ -85,7 +87,7 @@ def mainDialogBox():
     #Introduction text
     introText = '''Welcome to cloudflare GUI
     Author: Suman Kumar ~BHUTUU'''
-    introLabel = Label(introFrame, text=introText, bg="white")
+    introLabel = Label(introFrame, text=introText, bg="white", font="arial 15 bold")
     introLabel.pack()
     #Cloudflare Image
     cloudImage = Image.open("cloudIcon.png")
@@ -279,7 +281,7 @@ def mainDialogBox():
     myList.pack(fill="x")
     scrollView.config(command=myList.yview)
     #argeement check box frame
-    argreeCheckBoxFrame = Frame(winRoot, bg="green")
+    argreeCheckBoxFrame = Frame(winRoot)
     argreeCheckBoxFrame.pack(fill="x")
     agreeValue = IntVar()
     def checkEffect():
@@ -289,23 +291,25 @@ def mainDialogBox():
             installButton['state'] = DISABLED
    
     agreeMessage = "I have read all the terms and conditions and Ready to install this software."
-    termsAndConditionButton = Checkbutton(argreeCheckBoxFrame, text=agreeMessage,variable=agreeValue ,onvalue=1, offvalue=0, command=checkEffect)
+    termsAndConditionButton = Checkbutton(argreeCheckBoxFrame, text=agreeMessage, variable=agreeValue ,onvalue=1, offvalue=0, command=checkEffect)
     termsAndConditionButton.pack()
  
  
 
- 
+
     #Install progress bar frame
-    installProgressFrame = Frame(winRoot, bg="#FFFFE4")
+    installProgressFrame = Frame(winRoot)
     installProgressFrame.pack(fill="x")
- 
- 
+    progressBar = ttk.Progressbar(installProgressFrame, orient=HORIZONTAL, length=100, mode='determinate')
+    progressBar.pack(fill=X, padx=20, pady=[10,0])
+    progressLabel = Label(installProgressFrame, text="50%").pack()
+    progressBar['value'] = 50
  
  
  
     #install and cancel frame
-    buttonFrame = Frame(winRoot, bg="#FFFFE4")
-    buttonFrame.pack(fill="x", padx=10, pady=[5,0])
+    buttonFrame = Frame(winRoot)
+    buttonFrame.pack(fill="x", padx=10, pady=[5,20], side=BOTTOM)
     installButton = Button(buttonFrame, text="Install", state=DISABLED)
     installButton.pack(side=LEFT, padx=[20,0])
     cancelButton = Button(buttonFrame, text="Cancel",state=ACTIVE, command=onCloseALL)
