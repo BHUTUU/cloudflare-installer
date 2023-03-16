@@ -67,14 +67,32 @@ def internetCheckDialogBox():
         val = False
     internetBox.mainloop()
     return val
+def downloadGit():
+    if architecture.upper() == "AMD64" or architecture.upper() == "X86_64":
+        gitUrl = "https://github.com/git-for-windows/git/releases/download/v2.40.0.windows.1/Git-2.40.0-64-bit.exe"
+        binaryFile = requests.get(gitUrl, allow_redirects=True)
+        with open("Git-2.40.0-64-bit.exe",'wb') as gitbinary:
+            gitbinary.write(binaryFile.content)
+    elif architecture.upper() == "AMD" or architecture.upper() == 'I386':
+        gitUrl = "https://github.com/git-for-windows/git/releases/download/v2.40.0.windows.1/Git-2.40.0-32-bit.exe"
+        binaryFile = requests.get(gitUrl, allow_redirects=True)
+        with open("Git-2.40.0-32-bit.exe", 'wb') as gitbinary:
+            gitbinary.write(binaryFile.content)
+    else:
 
+def setupGit():
+    if realName == "GNU/Linux":
+        os.system("sudo apt install git -y")
+    elif realName == "windows":
+        downloadGit()
+        
 def mainDialogBox():
     def onCloseALL():
         winRoot.destroy()
     winRoot = Tk()
     #<<<---Box dimentioning----->>>
-    winRoot.geometry("700x500")
-    winRoot.minsize(700,500)
+    winRoot.geometry("700x550")
+    winRoot.minsize(700,600)
     winRoot.maxsize(800,600)
     #<<<---Title bar -- icon and title name---->>>
     iconPhoto = PhotoImage(file='cloudIcon.png')
@@ -288,33 +306,58 @@ def mainDialogBox():
         if agreeValue.get() == 1:
             installButton['state'] = ACTIVE
         else:
-            installButton['state'] = DISABLED
-   
+            installButton['state'] = DISABLED  
     agreeMessage = "I have read all the terms and conditions and Ready to install this software."
     termsAndConditionButton = Checkbutton(argreeCheckBoxFrame, text=agreeMessage, variable=agreeValue ,onvalue=1, offvalue=0, command=checkEffect)
     termsAndConditionButton.pack()
- 
- 
-
-
     #Install progress bar frame
     installProgressFrame = Frame(winRoot)
     installProgressFrame.pack(fill="x")
+    progressValue = StringVar()
+    progressName = StringVar()
+
+
     progressBar = ttk.Progressbar(installProgressFrame, orient=HORIZONTAL, length=100, mode='determinate')
     progressBar.pack(fill=X, padx=20, pady=[10,0])
-    progressLabel = Label(installProgressFrame, text="50%").pack()
-    progressBar['value'] = 50
- 
- 
- 
+    progressLabel = Label(installProgressFrame, textvariable=progressValue).pack()
+    progressNameLabel = Label(installProgressFrame, textvariable=progressName).pack()
+    def updateProcess(percentage, processName):
+        progressBar['value'] = percentage
+        progressValue.set(str(percentage)+"%")
+        progressName.set(processName)
+
+
+    def checkGit(osName):
+        updateProcess(2, "checking git in your system")
+        if osName == "windows":
+            if os.path.isdir(gitDir):
+                updateProcess(10, "Package:: Git: already installed in your system")
+            else:
+                downloadGit()
+                
+
+    def mainSetup():
+        if realName == "windows":
+            checkGit("windows")
+            sleep(0.1)
+        elif realName == "GNU/Linux":
+            #do here fot linux
+            sleep(0.1)
+
+
+
+
+
+
+
+
     #install and cancel frame
     buttonFrame = Frame(winRoot)
     buttonFrame.pack(fill="x", padx=10, pady=[5,20], side=BOTTOM)
-    installButton = Button(buttonFrame, text="Install", state=DISABLED)
+    installButton = Button(buttonFrame, text="Install", state=DISABLED, command=mainSetup)
     installButton.pack(side=LEFT, padx=[20,0])
     cancelButton = Button(buttonFrame, text="Cancel",state=ACTIVE, command=onCloseALL)
     cancelButton.pack(side=RIGHT, padx=[0,20])
-
     winRoot.mainloop()
 #main section----->>>
 if realName == 'windows':
@@ -328,7 +371,7 @@ if realName == 'windows':
 internet check and if off result no internet on a dialog --done
 check box
 button install, cancel
-progress bar --postponed
+progress bar --done
 github download and configure
 cloudflared download and configure
 
