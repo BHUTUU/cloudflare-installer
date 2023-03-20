@@ -6,13 +6,14 @@ Author: Suman Kumar ~BHUTUU
 Github: https://github.com/BHUTUU/cloudflare-installer
 Date: Bahut time lag gya hai bro ab date yaaad nhi hai. Aaj dhyan aaya hai ki documentation v likhna hota hai XD
 '''
-import os, requests, webbrowser, platform
+import os, requests, re, platform
 from time import sleep as sleep
 from tkinter import *
 from tkinter import ttk
 from PIL import Image, ImageTk
 #<<<------Internal Variables----->>>
 OS = str(os.name)
+MBFACTOR = float(1 << 20)
 if OS.upper() == 'NT':
     architecture = platform.machine()
     realName = "windows"
@@ -67,6 +68,20 @@ def internetCheckDialogBox():
         val = False
     internetBox.mainloop()
     return val
+def errorDialogbox(errorMessage):
+    def onCloseError():
+        errorBox.destroy()
+    errorBox = Tk()
+    errorBox.geometry("500x300")
+    errorBox.minsize(500,300)
+    errorBox.maxsize(800,500)
+    iconPhoto = PhotoImage(file='cloudIcon.png')
+    errorBox.iconphoto(False, iconPhoto)
+    errorBox.title("Cloudflared-Installer")
+    messageLabel = Label(errorBox, text=errorMessage, font="arial 16 italic").pack(pady=50)
+    closeBtn = Button(errorBox, text="Close", command=onCloseError).pack()
+    errorBox.mainloop()
+
 def downloadGit():
     if architecture.upper() == "AMD64" or architecture.upper() == "X86_64":
         gitUrl = "https://github.com/git-for-windows/git/releases/download/v2.40.0.windows.1/Git-2.40.0-64-bit.exe"
@@ -79,6 +94,8 @@ def downloadGit():
         with open("Git-2.40.0-32-bit.exe", 'wb') as gitbinary:
             gitbinary.write(binaryFile.content)
     else:
+        errorDialogbox("Sorry but your device doesn't support this setup")        
+        
 
 def setupGit():
     if realName == "GNU/Linux":
@@ -316,6 +333,30 @@ def mainDialogBox():
     progressValue = StringVar()
     progressName = StringVar()
 
+    def addDownloader(url, filename, oldPercentage, limitPercentage, message):
+        percentageDifference = limitPercentage - oldPercentage
+        percentIncreament = float(percentageDifference / 100)
+        percentRecord = 0
+        req = requests.get(url, stream=True)
+        if req.headers['Content-Length']:
+            total_size = int(req.headers['Content-Length'])
+            print(total_size)
+        else:
+            total_size = None
+        if 'Content-Disposition' in req.headers.keys():
+            fname = re.findall("filename=(.+)", req.headers["Content-Disposition"])[0]
+        else:
+            fname = url.split("/")[-1]
+        with open(fname, 'wb') as fileobj:
+            for chunk in req.iter_content(chunk_size=1024):
+                if chunk:
+                    fileobj.write(chunk)
+                    current_size = int(os.path.getsize(filename))
+                    percentg = round((current_size / total_size)*100)
+                    if percentg > percentRecord:
+                        oldPercentage+=percentIncreament
+                        updateProcess(round(oldPercentage), message)
+                        percentRecord=percentg
 
     progressBar = ttk.Progressbar(installProgressFrame, orient=HORIZONTAL, length=100, mode='determinate')
     progressBar.pack(fill=X, padx=20, pady=[10,0])
@@ -333,7 +374,8 @@ def mainDialogBox():
             if os.path.isdir(gitDir):
                 updateProcess(10, "Package:: Git: already installed in your system")
             else:
-                downloadGit()
+                # <<<--- download manager----->> --needed to be implented with oringional and functional prorgess bar
+
                 
 
     def mainSetup():
@@ -359,7 +401,7 @@ def mainDialogBox():
     cancelButton = Button(buttonFrame, text="Cancel",state=ACTIVE, command=onCloseALL)
     cancelButton.pack(side=RIGHT, padx=[0,20])
     winRoot.mainloop()
-#main section----->>>
+# main section----->>>
 if realName == 'windows':
     if internetCheckDialogBox():
         mainDialogBox()
