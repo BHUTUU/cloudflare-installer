@@ -10,7 +10,9 @@ import os, requests, re, platform
 from time import sleep as sleep
 from tkinter import *
 from tkinter import ttk
+import tkinter.messagebox as errorDialogBox
 from PIL import Image, ImageTk
+import threading
 #<<<------Internal Variables----->>>
 OS = str(os.name)
 MBFACTOR = float(1 << 20)
@@ -34,7 +36,6 @@ def internetCheck():
         return True
     except:
         return False
-
 def internetCheckDialogBox():
     val = None
     internetBox = Tk()
@@ -68,41 +69,6 @@ def internetCheckDialogBox():
         val = False
     internetBox.mainloop()
     return val
-def errorDialogbox(errorMessage):
-    def onCloseError():
-        errorBox.destroy()
-    errorBox = Tk()
-    errorBox.geometry("500x300")
-    errorBox.minsize(500,300)
-    errorBox.maxsize(800,500)
-    iconPhoto = PhotoImage(file='cloudIcon.png')
-    errorBox.iconphoto(False, iconPhoto)
-    errorBox.title("Cloudflared-Installer")
-    messageLabel = Label(errorBox, text=errorMessage, font="arial 16 italic").pack(pady=50)
-    closeBtn = Button(errorBox, text="Close", command=onCloseError).pack()
-    errorBox.mainloop()
-
-def downloadGit():
-    if architecture.upper() == "AMD64" or architecture.upper() == "X86_64":
-        gitUrl = "https://github.com/git-for-windows/git/releases/download/v2.40.0.windows.1/Git-2.40.0-64-bit.exe"
-        binaryFile = requests.get(gitUrl, allow_redirects=True)
-        with open("Git-2.40.0-64-bit.exe",'wb') as gitbinary:
-            gitbinary.write(binaryFile.content)
-    elif architecture.upper() == "AMD" or architecture.upper() == 'I386':
-        gitUrl = "https://github.com/git-for-windows/git/releases/download/v2.40.0.windows.1/Git-2.40.0-32-bit.exe"
-        binaryFile = requests.get(gitUrl, allow_redirects=True)
-        with open("Git-2.40.0-32-bit.exe", 'wb') as gitbinary:
-            gitbinary.write(binaryFile.content)
-    else:
-        errorDialogbox("Sorry but your device doesn't support this setup")        
-        
-
-def setupGit():
-    if realName == "GNU/Linux":
-        os.system("sudo apt install git -y")
-    elif realName == "windows":
-        downloadGit()
-        
 def mainDialogBox():
     def onCloseALL():
         winRoot.destroy()
@@ -327,12 +293,87 @@ def mainDialogBox():
     agreeMessage = "I have read all the terms and conditions and Ready to install this software."
     termsAndConditionButton = Checkbutton(argreeCheckBoxFrame, text=agreeMessage, variable=agreeValue ,onvalue=1, offvalue=0, command=checkEffect)
     termsAndConditionButton.pack()
-    #Install progress bar frame
-    installProgressFrame = Frame(winRoot)
-    installProgressFrame.pack(fill="x")
-    progressValue = StringVar()
-    progressName = StringVar()
+    #<-----Git bash downloader and installer------>
+    def downloadGit():
+        if architecture.upper() == "AMD64" or architecture.upper() == "X86_64":
+            gitUrl = "https://github.com/git-for-windows/git/releases/download/v2.40.0.windows.1/Git-2.40.0-64-bit.exe"
+            fileName = gitUrl.split('/')[-1]
+            if os.path.exists(fileName):
+                os.remove(fileName)
+        elif architecture.upper() == "AMD" or architecture.upper() == 'I386':
+            gitUrl = "https://github.com/git-for-windows/git/releases/download/v2.40.0.windows.1/Git-2.40.0-32-bit.exe"
+            fileName = gitUrl.split("/")[-1]
+            if os.path.exists(fileName):
+                os.remove(fileName)
+        else:
+            errorDialogBox.showinfo(title="Setup Error!",message="Sorry but your device doesn't support this setup", icon='error')
+            exit(1)
+        addDownloader(gitUrl, fileName, 2, 20, "Downloading Git Bash....")
+######Dont play in this sectoin for your goodness :) ##########################
+        for i in range(2):                                                    #
+            if not os.path.exists(gitDir):                                    #
+                os.system("start "+fileName)                                  #
+                sleep(2)                                                      #
+            else:                                                             #
+                updateProcess(20, "Git Bash  installed Successfully!")        #
+                break                                                         #
+###############################################################################
+#<<<-----------Cloudflare download and setup ------------------>>>
+    def downloadCloudflare():
+        if realName == "windows":
+            if os.path.isfile(gitDir+"/cloudflared.exe"):
+                errorDialogBox.showinfo(title='Setup Error!', message="Cloudflared is already installed in your system!", icon='error')
+                SystemExit(0)
+            else:
+                os.chdir(downloadFolder)
+                if architecture.upper() == "AMD64" or architecture.upper() == "X86_64":
+                    cloudUrl="https://github.com/cloudflare/cloudflared/releases/download/2023.3.1/cloudflared-windows-amd64.exe"
+                    fileName = cloudUrl.split('/')[-1]
+                    if os.path.exists(fileName):
+                        os.remove(fileName)
+                elif architecture.upper() == "AMD" or architecture.upper() == 'I386':
+                    cloudUrl="https://github.com/cloudflare/cloudflared/releases/download/2023.3.1/cloudflared-windows-386.exe"
+                    fileName=cloudUrl.split('/')[-1]
+                    if os.path.exists(fileName):
+                        os.remove(fileName)
+                else:
+                    errorDialogBox.showinfo(title="Setup Error!",message="Sorry but your device doesn't support this setup", icon='error')
 
+                    SystemExit(0)
+                addDownloader(cloudUrl, fileName, 20, 80, "Downloading cloudfalred binary... :)")
+                os.rename(fileName,gitDir+"/cloudflared.exe")
+        elif realName == 'GNU/Linux':
+            if os.path.exists('/usr/bin/cloudflared'):
+                errorDialogBox.showinfo(title='Setup Error!',message="CloudFlared is already installed!", icon='error')
+                SystemExit(0)
+            else:
+                if architecture.upper() == 'AMD64' or architecture.upper() == 'X86_64':
+                    cloudUrl="https://github.com/cloudflare/cloudflared/releases/download/2023.3.1/cloudflared-linux-amd64"
+                    fileName=cloudUrl.split('/')[-1]
+                    if os.path.exists(fileName):
+                        os.remove(fileName)
+                elif architecture.upper() == 'AMD' or architecture.upper() == 'I386':
+                    cloudUrl="https://github.com/cloudflare/cloudflared/releases/download/2023.3.1/cloudflared-linux-386"
+                    fileName=cloudUrl.split('/')[-1]
+                    if os.path.exists(fileName):
+                        os.remove(fileName)
+                elif architecture.upper() == 'AARCH64' or architecture.upper() =='ARM64':
+                    cloudUrl="https://github.com/cloudflare/cloudflared/releases/download/2023.3.1/cloudflared-linux-arm64"
+                    fileName=cloudUrl.split('/')[-1]
+                    if os.path.exists(fileName):
+                        os.remove(fileName)
+                elif architecture.upper() == 'AARCH32' or architecture.upper() == 'ARM32' or architecture.upper() == 'ARM':
+                    cloudUrl="https://github.com/cloudflare/cloudflared/releases/download/2023.3.1/cloudflared-linux-arm"
+                    fileName=cloudUrl.split('/')[-1]
+                    if os.path.exists(fileName):
+                        os.remove(fileName)
+                else:
+                    errorDialogBox.showinfo(title='Setup Error!',message="This setup is not for your architecture of device! Install manually!!", icon='error')
+                    SystemExit(0)
+                addDownloader(cloudUrl, fileName, 20, 80, "Downloading cloudfalred binary... :)")
+                os.rename(fileName,pathDir+"/cloudflared")
+        updateProcess(90, "download completed")
+    #<<<------All binary file downloader-------->>>
     def addDownloader(url, filename, oldPercentage, limitPercentage, message):
         percentageDifference = limitPercentage - oldPercentage
         percentIncreament = float(percentageDifference / 100)
@@ -340,7 +381,6 @@ def mainDialogBox():
         req = requests.get(url, stream=True)
         if req.headers['Content-Length']:
             total_size = int(req.headers['Content-Length'])
-            print(total_size)
         else:
             total_size = None
         if 'Content-Disposition' in req.headers.keys():
@@ -357,40 +397,75 @@ def mainDialogBox():
                         oldPercentage+=percentIncreament
                         updateProcess(round(oldPercentage), message)
                         percentRecord=percentg
-
+    #<<<<--- Installtaion progress bar------>>>
+    installProgressFrame = Frame(winRoot)
+    installProgressFrame.pack(fill="x")
+    progressValue = StringVar()
+    progressName = StringVar()
     progressBar = ttk.Progressbar(installProgressFrame, orient=HORIZONTAL, length=100, mode='determinate')
     progressBar.pack(fill=X, padx=20, pady=[10,0])
     progressLabel = Label(installProgressFrame, textvariable=progressValue).pack()
     progressNameLabel = Label(installProgressFrame, textvariable=progressName).pack()
     def updateProcess(percentage, processName):
+        winRoot.update_idletasks()
         progressBar['value'] = percentage
         progressValue.set(str(percentage)+"%")
         progressName.set(processName)
-
-
     def checkGit(osName):
-        updateProcess(2, "checking git in your system")
+        updateProcess(2, "Checking git bash in your system")
         if osName == "windows":
             if os.path.isdir(gitDir):
-                updateProcess(10, "Package:: Git: already installed in your system")
+                updateProcess(20, "Package:: Git: already installed in your system")
             else:
-                # <<<--- download manager----->> --needed to be implented with oringional and functional prorgess bar
-
-                
+                updateProcess(2, "Package: Git Bash not found in your system!")
+                downloadGit()
+        elif osName == "GNU/Linux":
+            gitCommand = os.path.isfile("/usr/bin/git")
+            if gitCommand:
+                updateProcess(20, "Package:: Git: already installed in your system")
+            else:
+                updateProcess(2, "Package: git not found in your system! Installing...")
+                os.system("apt install git -y")
+                updateProcess(20, "git installed successfully..!")
+    def onFinishClose():
+        exit(0)
+    def finishSetup():
+        updateProcess(90, "Finishing setup.....!")
+        if realName == "windows":
+            if not os.path.exists(gitDir+'/cloudflared.exe'):
+                errorDialogBox.showinfo(title='Setup Error!',message="Sorry! but somehow setup is failed! Try again", icon='error')
+                SystemExit(0)
+        if realName == 'GNU/Linux':
+            if not os.path.exists(pathDir+'/cloudflared'):
+                errorDialogBox.showinfo(title='Setup Error!',message="Sorry! but somehow setup is failed! Try again", icon='error')
+                SystemExit(0)
+            else:
+                os.system("chmod +x "+pathDir+'/cloudflared')
+        for widget in termsAndConditionFrame.winfo_children():
+            widget.destroy()
+        termsAndConditionFrame.destroy()
+        installButton.destroy()
+        cancelButton.destroy()
+        updateProcess(100, "Setup Completed! Thank you!")
+        finishButton = Button(buttonFrame, text="Finish", command=onFinishClose).pack()
+    def mainSetupForWindows():
+        checkGit("windows")
+        sleep(0.1)
+        downloadCloudflare()
+        finishSetup()
+    def mainSetupForLinux():
+        checkGit("GNU/Linux")
+        sleep(0.1)
+        downloadCloudflare()
+        finishSetup()
 
     def mainSetup():
         if realName == "windows":
-            checkGit("windows")
-            sleep(0.1)
+            argreeCheckBoxFrame.destroy()
+            installButton['state'] = DISABLED
+            threading.Thread(target=mainSetupForWindows).start()
         elif realName == "GNU/Linux":
-            #do here fot linux
-            sleep(0.1)
-
-
-
-
-
-
+            threading.Thread(target=mainSetupForLinux).start()
 
 
     #install and cancel frame
@@ -411,11 +486,13 @@ if realName == 'windows':
 #planning section---->>>
 '''
 internet check and if off result no internet on a dialog --done
-check box
-button install, cancel
+check box --done
+button install, cancel --done
 progress bar --done
-github download and configure
-cloudflared download and configure
+github download and configure --done
+cloudflared download and configure --done
+rename permission ---to implement
+errorDialog error ---to check
 
 
 '''
