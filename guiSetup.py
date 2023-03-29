@@ -12,7 +12,7 @@ from tkinter import *
 from tkinter import ttk
 import tkinter.messagebox as errorDialogBox
 from PIL import Image, ImageTk
-import threading
+import threading, base64, ImageRequired
 #<<<------Internal Variables----->>>
 OS = str(os.name)
 MBFACTOR = float(1 << 20)
@@ -28,6 +28,20 @@ elif OS.upper() == 'POSIX' or OS.upper() == 'GNU/LINUX' or OS.upper() == 'LINUX'
     homeDir = os.path.expanduser('~')
     rootDir = '/usr'
     pathDir = '/usr/bin'
+#<<<---------------RunTime cache---------->>>
+def cleanCache():
+    for i in ['.cloudIcon.png', '.bhutuuIcon.png']:
+        if os.path.exists(i):
+            os.remove(i)
+cleanCache()
+bytes_data1 = base64.b64decode(ImageRequired.cloudImageBytes)
+bytes_data2 = base64.b64decode(ImageRequired.bhutuuImageBytes)
+cloudImageFile = open('.cloudIcon.png', 'wb')
+bhutuuImageFile = open('.bhutuuIcon.png', 'wb')
+cloudImageFile.write(bytes_data1)
+bhutuuImageFile.write(bytes_data2)
+cloudImageFile.close()
+bhutuuImageFile.close()
 #<<<-----Functions----->>>
 def internetCheck():
     try:
@@ -44,7 +58,7 @@ def internetCheckDialogBox():
     internetBox.minsize(500, 400)
     # internetBox.maxsize(400, 400)
     #<<<-----Title bar -- icon and title name---->>>
-    iconPhoto = PhotoImage(file='cloudIcon.png')
+    iconPhoto = PhotoImage(file='.cloudIcon.png')
     internetBox.iconphoto(False, iconPhoto)
     internetBox.title("Cloudflared-Installer")
     def onCloseTrue():
@@ -78,7 +92,7 @@ def mainDialogBox():
     winRoot.minsize(700,600)
     winRoot.maxsize(800,600)
     #<<<---Title bar -- icon and title name---->>>
-    iconPhoto = PhotoImage(file='cloudIcon.png')
+    iconPhoto = PhotoImage(file='.cloudIcon.png')
     winRoot.iconphoto(False, iconPhoto)
     winRoot.title("Cloudflared-Installer")
     #<<---Frames--->>
@@ -91,13 +105,13 @@ def mainDialogBox():
     introLabel = Label(introFrame, text=introText, bg="white", font="arial 15 bold")
     introLabel.pack()
     #Cloudflare Image
-    cloudImage = Image.open("cloudIcon.png")
+    cloudImage = Image.open(".cloudIcon.png")
     resizedCloudImage= cloudImage.resize((100,100), Image.LANCZOS)
     plugCloudImage = ImageTk.PhotoImage(resizedCloudImage)
     cloudImageLable = Label(introFrame, image=plugCloudImage, bg="white")
     cloudImageLable.pack(side=LEFT, padx=[50,0])
     #Bhutuu Image
-    bhutuuImage = Image.open("bhutuu.png")
+    bhutuuImage = Image.open(".bhutuuIcon.png")
     resizedBhutuuImage = bhutuuImage.resize((100,100), Image.LANCZOS)
     plugBhutuuImage = ImageTk.PhotoImage(resizedBhutuuImage)
     bhutuuImageLable = Label(introFrame, image=plugBhutuuImage, bg="white")
@@ -323,6 +337,7 @@ def mainDialogBox():
         if realName == "windows":
             if os.path.isfile(gitDir+"/cloudflared.exe"):
                 errorDialogBox.showinfo(title='Setup Error!', message="Cloudflared is already installed in your system!", icon='error')
+                cleanCache()
                 SystemExit(0)
             else:
                 os.chdir(downloadFolder)
@@ -338,13 +353,14 @@ def mainDialogBox():
                         os.remove(fileName)
                 else:
                     errorDialogBox.showinfo(title="Setup Error!",message="Sorry but your device doesn't support this setup", icon='error')
-
+                    cleanCache()
                     SystemExit(0)
                 addDownloader(cloudUrl, fileName, 20, 80, "Downloading cloudfalred binary... :)")
                 os.rename(fileName,gitDir+"/cloudflared.exe")
         elif realName == 'GNU/Linux':
             if os.path.exists('/usr/bin/cloudflared'):
                 errorDialogBox.showinfo(title='Setup Error!',message="CloudFlared is already installed!", icon='error')
+                cleanCache()
                 SystemExit(0)
             else:
                 if architecture.upper() == 'AMD64' or architecture.upper() == 'X86_64':
@@ -369,6 +385,7 @@ def mainDialogBox():
                         os.remove(fileName)
                 else:
                     errorDialogBox.showinfo(title='Setup Error!',message="This setup is not for your architecture of device! Install manually!!", icon='error')
+                    cleanCache()
                     SystemExit(0)
                 addDownloader(cloudUrl, fileName, 20, 80, "Downloading cloudfalred binary... :)")
                 os.rename(fileName,pathDir+"/cloudflared")
@@ -428,16 +445,20 @@ def mainDialogBox():
                 os.system("apt install git -y")
                 updateProcess(20, "git installed successfully..!")
     def onFinishClose():
-        exit(0)
+        cleanCache()
+        SystemExit(0)
+        winRoot.destroy()
     def finishSetup():
         updateProcess(90, "Finishing setup.....!")
         if realName == "windows":
             if not os.path.exists(gitDir+'/cloudflared.exe'):
                 errorDialogBox.showinfo(title='Setup Error!',message="Sorry! but somehow setup is failed! Try again", icon='error')
+                cleanCache()
                 SystemExit(0)
         if realName == 'GNU/Linux':
             if not os.path.exists(pathDir+'/cloudflared'):
                 errorDialogBox.showinfo(title='Setup Error!',message="Sorry! but somehow setup is failed! Try again", icon='error')
+                cleanCache()
                 SystemExit(0)
             else:
                 os.system("chmod +x "+pathDir+'/cloudflared')
@@ -458,6 +479,7 @@ def mainDialogBox():
         sleep(0.1)
         downloadCloudflare()
         finishSetup()
+        
 
     def mainSetup():
         if realName == "windows":
