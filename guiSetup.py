@@ -34,14 +34,15 @@ def cleanCache():
         if os.path.exists(i):
             os.remove(i)
 cleanCache()
-bytes_data1 = base64.b64decode(ImageRequired.cloudImageBytes)
-bytes_data2 = base64.b64decode(ImageRequired.bhutuuImageBytes)
-cloudImageFile = open('.cloudIcon.png', 'wb')
-bhutuuImageFile = open('.bhutuuIcon.png', 'wb')
-cloudImageFile.write(bytes_data1)
-bhutuuImageFile.write(bytes_data2)
-cloudImageFile.close()
-bhutuuImageFile.close()
+def getCache():
+    bytes_data1 = base64.b64decode(ImageRequired.cloudImageBytes)
+    bytes_data2 = base64.b64decode(ImageRequired.bhutuuImageBytes)
+    cloudImageFile = open('.cloudIcon.png', 'wb')
+    bhutuuImageFile = open('.bhutuuIcon.png', 'wb')
+    cloudImageFile.write(bytes_data1)
+    bhutuuImageFile.write(bytes_data2)
+    cloudImageFile.close()
+    bhutuuImageFile.close()
 #<<<-----Functions----->>>
 def internetCheck():
     try:
@@ -58,8 +59,10 @@ def internetCheckDialogBox():
     internetBox.minsize(500, 400)
     # internetBox.maxsize(400, 400)
     #<<<-----Title bar -- icon and title name---->>>
+    getCache()
     iconPhoto = PhotoImage(file='.cloudIcon.png')
     internetBox.iconphoto(False, iconPhoto)
+    cleanCache()
     internetBox.title("Cloudflared-Installer")
     def onCloseTrue():
         val = True
@@ -92,6 +95,7 @@ def mainDialogBox():
     winRoot.minsize(700,600)
     winRoot.maxsize(800,600)
     #<<<---Title bar -- icon and title name---->>>
+    getCache()
     iconPhoto = PhotoImage(file='.cloudIcon.png')
     winRoot.iconphoto(False, iconPhoto)
     winRoot.title("Cloudflared-Installer")
@@ -116,6 +120,7 @@ def mainDialogBox():
     plugBhutuuImage = ImageTk.PhotoImage(resizedBhutuuImage)
     bhutuuImageLable = Label(introFrame, image=plugBhutuuImage, bg="white")
     bhutuuImageLable.pack(side=RIGHT, padx=[0,50])
+    cleanCache()
     #Terms and conditions frame
     termsAndConditionFrame = Frame(winRoot, bg="white", highlightbackground="pink", highlightthickness=3)
     termsAndConditionFrame.pack(fill="x", padx=10, pady=10)
@@ -479,8 +484,6 @@ def mainDialogBox():
         sleep(0.1)
         downloadCloudflare()
         finishSetup()
-        
-
     def mainSetup():
         if realName == "windows":
             argreeCheckBoxFrame.destroy()
@@ -488,8 +491,6 @@ def mainDialogBox():
             threading.Thread(target=mainSetupForWindows).start()
         elif realName == "GNU/Linux":
             threading.Thread(target=mainSetupForLinux).start()
-
-
     #install and cancel frame
     buttonFrame = Frame(winRoot)
     buttonFrame.pack(fill="x", padx=10, pady=[5,20], side=BOTTOM)
@@ -502,6 +503,7 @@ def mainDialogBox():
 if realName == 'windows':
     if internetCheckDialogBox():
         mainDialogBox()
+        cleanCache()
     else:
         exit(1)
 
