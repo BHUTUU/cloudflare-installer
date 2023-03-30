@@ -6,13 +6,22 @@ Author: Suman Kumar ~BHUTUU
 Github: https://github.com/BHUTUU/cloudflare-installer
 Date: Bahut time lag gya hai bro ab date yaaad nhi hai. Aaj dhyan aaya hai ki documentation v likhna hota hai XD
 '''
-import os, requests, re, platform
+import os, re, platform
 from time import sleep as sleep
 from tkinter import *
 from tkinter import ttk
 import tkinter.messagebox as errorDialogBox
-from PIL import Image, ImageTk
 import threading, base64, ImageRequired
+try:
+    from PIL import Image, ImageTk
+except ImportError:
+    os.system('pip install pillow')
+    from PIL import Image, ImageTk
+try:
+    import requests
+except ImportError:
+    os.system('pip install requests')
+    import requests
 #<<<------Internal Variables----->>>
 OS = str(os.name)
 MBFACTOR = float(1 << 20)
