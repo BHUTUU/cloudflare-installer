@@ -328,15 +328,12 @@ def mainDialogBox():
             errorDialogBox.showinfo(title="Setup Error!",message="Sorry but your device doesn't support this setup", icon='error')
             exit(1)
         addDownloader(gitUrl, fileName, 2, 20, "Downloading Git Bash....")
-######Dont play in this sectoin for your goodness :) ##########################
-        for i in range(2):                                                    #
-            if not os.path.exists(gitDir):                                    #
-                os.system("start "+fileName)                                  #
-                sleep(2)                                                      #
-            else:                                                             #
-                updateProcess(20, "Git Bash  installed Successfully!")        #
-                break                                                         #
-###############################################################################
+######Dont play in this sectoin for your goodness :) ######################
+        if not os.path.exists(gitDir):                                    #
+            os.system("start "+fileName)                                  #
+        else:                                                             #
+            updateProcess(20, "Git Bash  installed Successfully!")        #
+###########################################################################
 #<<<-----------Cloudflare download and setup ------------------>>>
     def downloadCloudflare():
         if realName == "windows":
@@ -361,6 +358,8 @@ def mainDialogBox():
                     cleanCache()
                     SystemExit(0)
                 addDownloader(cloudUrl, fileName, 20, 80, "Downloading cloudfalred binary... :)")
+                if not os.path.exists(gitDir):
+                    os.makedirs(gitDir)
                 os.rename(fileName,gitDir+"/cloudflared.exe")
         elif realName == 'GNU/Linux':
             if os.path.exists('/usr/bin/cloudflared'):
